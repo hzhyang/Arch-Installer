@@ -5,6 +5,8 @@ read -p "ENTER to continue "
 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 hwclock --systohc --utc
 echo zh_CN.UTF-8 UTF-8 > /etc/locale.gen
+
+echo en_US.UTF-8 UTF-8 > /etc/locale.gen
 locale-gen
 echo LANG=zh_CN.UTF-8 > /etc/locale.conf
 read -p "Input your hostname:  " HOSTNAME
@@ -21,9 +23,13 @@ then TMP=n
     done
 else TMP=n
     while [ "$TMP" == n ];do
-        pacman -S --noconfirm grub&&fdisk -l
+        pacman -S --noconfirm grub  os-prober &&pacman -S --noconfirm ntfs-3g
+        
+        fdisk -l
         read -p "Input the disk you want to install the grub  " GRUB
         grub-install --target=i386-pc $GRUB
+        
+        os-prober
         grub-mkconfig -o /boot/grub/grub.cfg
         read -p "Successfully installed ? (n or Enter  " TMP
     done
@@ -93,6 +99,7 @@ Server = http://mirrors.163.com/archlinux-cn/\$arch" >> /etc/pacman.conf
 TMP=n
 while [ "$TMP" == n ]
 do
+
     pacman -Syu&&pacman -S --noconfirm archlinuxcn-keyring&&pacman -S --noconfirm networkmanager xorg-server firefox yaourt wqy-zenhei sudo
     systemctl enable NetworkManager
     read -p "Do you have bluetooth ? (y or Enter  " TMP
